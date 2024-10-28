@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Викторина: Тела и вещества</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        width: 80%;
+        max-width: 600px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    .hero {
+        position: relative;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .hero img {
+        width: 80px;
+        margin-right: 10px;
+    }
+    .score {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+    }
+    .question {
+        font-size: 1.3em;
+        margin: 20px 0;
+    }
+    .answer {
+        display: block;
+        margin: 10px 0;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .answer.correct {
+        background-color: #c8e6c9;
+    }
+    .answer.incorrect {
+        background-color: #ffcdd2;
+    }
+    .next-button {
+        display: none;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+    .result {
+        font-size: 1.2em;
+        margin-top: 20px;
+    }
+    .emoji {
+        font-size: 2em;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hero">
+        <img src="https://example.com/znaiko.png" alt="Знайко, изследовател с очила и книга">
+        <div class="score">Точки: <span id="score">0</span></div>
+    </div>
+    <div class="question" id="question"></div>
+    <div id="answers"></div>
+    <button class="next-button" id="nextButton" onclick="nextQuestion()">Следващ въпрос</button>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    const quiz = [
+        { question: "Кое от следните е твърдо тяло?", answers: ["Вода", "Стъкло", "Въздух"], correct: 1 },
+        { question: "Кое вещество се използва за дишане?", answers: ["Азот", "Въглероден диоксид", "Кислород"], correct: 2 },
+        { question: "Кое от следните вещества е течност?", answers: ["Желязо", "Мляко", "Пясък"], correct: 1 },
+        { question: "Кое от изброените е газ?", answers: ["Мед", "Вода", "Въздух"], correct: 2 },
+        { question: "Как се нарича процесът на превръщане на твърдо тяло в течност?", answers: ["Замръзване", "Топене", "Изпарение"], correct: 1 },
+        { question: "Кое от следните тела има най-голяма плътност?", answers: ["Дърво", "Въздух", "Стомана"], correct: 2 },
+        { question: "Кое свойство описва как едно тяло заема място?", answers: ["Масата", "Обемът", "Температурата"], correct: 1 },
+        { question: "Какво се случва с обема на водата, когато замръзва?", answers: ["Намалява", "Остава същият", "Увеличава се"], correct: 2 },
+        { question: "Кой процес превръща водата от течност в газ?", answers: ["Кипене", "Топене", "Замръзване"], correct: 0 },
+        { question: "Кое от следните е разтворимо във вода?", answers: ["Пясък", "Захар", "Желязо"], correct: 1 },
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        document.getElementById("nextButton").style.display = "none";
+        document.getElementById("result").innerHTML = "";
+        const question = quiz[currentQuestion];
+        document.getElementById("question").innerText = question.question;
+        document.getElementById("answers").innerHTML = "";
+        question.answers.forEach((answer, index) => {
+            const button = document.createElement("button");
+            button.classList.add("answer");
+            button.innerText = answer;
+            button.onclick = () => selectAnswer(index);
+            document.getElementById("answers").appendChild(button);
+        });
+    }
+
+    function selectAnswer(index) {
+        const question = quiz[currentQuestion];
+        const answers = document.querySelectorAll(".answer");
+        if (index === question.correct) {
+            answers[index].classList.add("correct");
+            score++;
+            document.getElementById("score").innerText = score;
+        } else {
+            answers[index].classList.add("incorrect");
+            answers[question.correct].classList.add("correct");
+        }
+        document.getElementById("nextButton").style.display = "block";
+        answers.forEach(answer => answer.onclick = null);  // Disable further clicks
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < quiz.length) {
+            loadQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        document.getElementById("question").innerHTML = "";
+        document.getElementById("answers").innerHTML = "";
+        document.getElementById("nextButton").style.display = "none";
+        let message = "";
+        let emoji = "";
+
+        if (score >= 9) {
+            message = "Справихте се отлично!";
+            emoji = "😊";
+        } else if (score >= 7) {
+            message = "Справихте се много добре!";
+            emoji = "😊";
+        } else if (score >= 5) {
+            message = "Справихте се добре!";
+            emoji = "😊";
+        } else {
+            message = "Прочети още по темата и играй отново!";
+            emoji = "😞";
+        }
+
+        document.getElementById("result").innerHTML = `Вие събрахте общо ${score} точки.<br>${message}`;
+        document.getElementById("result").innerHTML += `<div class="emoji">${emoji}</div>`;
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
